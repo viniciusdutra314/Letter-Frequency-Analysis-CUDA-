@@ -1,30 +1,18 @@
-#include <fstream>
-#include <iostream>
-#include <exception>
 #include <string>
-#include <iostream>
-#include <algorithm>
-#include <numeric>
 #include <vector>
-#include "print_sorted.hpp"
+#include "auxilary_funcs.hpp"
 
 
 
 int main(){
+    std::string file_str=open_file_as_string("sherlock_holmes_canon.txt");
+    std::vector<int> histogram(256);
 
-    auto file=std::ifstream("sherlock_homes_canon.txt");
-    if (!file.is_open()){
-        throw std::invalid_argument("File doesn't exist or it couldn't been opened");
+    Timer time_all("Time of execution (CPU)");
+    for (u_char character : file_str) {
+        histogram[character]++;
     }
 
-    std::vector<int> letter_occurrences(256);
-    std::string line_text;
-    while (getline(file,line_text)){
-        for (u_char character:line_text){
-            if (!isspace(character)){
-                letter_occurrences[character]++;
-            }   
-        }
-    }
-    print_sorted(letter_occurrences);
+    time_all.stop();
+    save_sorted_to_file(histogram);
 }
