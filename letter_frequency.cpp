@@ -5,14 +5,19 @@
 
 
 int main(){
-    std::string file_str=open_file_as_string("sherlock_holmes_canon.txt");
+    Timer time_all("(CPU) Total time: ");
+    std::string file_str=open_file_as_string("input.txt");
     std::vector<int> histogram(256);
 
-    Timer time_all("Time of execution (CPU)");
+    Timer time_processing("(CPU) Processing: ");
     for (u_char character : file_str) {
         histogram[character]++;
     }
 
+    time_processing.stop();
     time_all.stop();
-    save_sorted_to_file(histogram);
+   
+    std::cout<<std::endl;
+
+    save_sorted_to_file(histogram,"output/histogram_cpu.txt");
 }

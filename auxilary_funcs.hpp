@@ -22,21 +22,21 @@ std::string open_file_as_string(std::string filename){
 }
 
 
-void save_sorted_to_file(const std::vector<int> &letter_occurrences) {
-    std::vector<std::pair<u_char, int>> letter_occurrences_sorted(256);
+void save_sorted_to_file(const std::vector<int> &histogram, std::string filename) {
+    std::vector<std::pair<u_char, int>> histogram_sorted(256);
     for (int i = 0; i < 256; i++) {
-        letter_occurrences_sorted[i] = {(u_char)i, letter_occurrences[i]};
+        histogram_sorted[i] = {(u_char)i, histogram[i]};
     }
-    std::sort(letter_occurrences_sorted.begin(), letter_occurrences_sorted.end(),
+    std::sort(histogram_sorted.begin(), histogram_sorted.end(),
               [](auto x1, auto x2) { return x1.second > x2.second; });
 
-    int total_num_characters = std::reduce(letter_occurrences.begin(), letter_occurrences.end());
-    std::ofstream outfile("sorted_histogram.txt");
+    int total_num_characters = std::reduce(histogram.begin(), histogram.end());
+    std::ofstream outfile(filename);
     if (!outfile.is_open()) {
         std::cerr << "Failed to open file: sorted_histogram.txt\n";
         return;
     }
-    for (auto [character, occurrences] : letter_occurrences_sorted) {
+    for (auto [character, occurrences] : histogram_sorted) {
         if (occurrences != 0) {
             float percentage = 100 * (float)occurrences / total_num_characters;
             outfile << character << " (" << percentage << " %)" << std::endl;
@@ -53,13 +53,13 @@ public:
 
     void stop() {
         auto end = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<double, std::milli> duration = end - start;
-        std::cout << message << " took " << duration.count() << " ms" << std::endl;
+        duration = end - start;
+        std::cout << message <<  duration.count() << " ms" << std::endl;
     }
 
-private:
     std::string message;
     std::chrono::high_resolution_clock::time_point start;
+    std::chrono::duration<double, std::milli> duration;
 };
 
 

@@ -30,17 +30,20 @@ class increment
 };
 
 int main(){  
-    Timer time_all("Time execution (GPU-Thrust)");
-    std::string h_text=open_file_as_string("sherlock_holmes_canon.txt");
+    Timer time_all("(GPU-Thrust) Total time: ");
+    std::string h_text=open_file_as_string("input.txt");
     //moving to the device
     thrust::device_vector<u_char> d_text(h_text.begin(), h_text.end());
     thrust::device_vector<int> d_histogram(256, 0);
+    Timer time_processing("(GPU-Thrust) Processing: ");
     thrust::for_each(d_text.begin(), d_text.end(), increment(d_histogram));
     
     //moving to the host
     std::vector<int> h_histogram(d_histogram.size());
     thrust::copy(d_histogram.begin(), d_histogram.end(), h_histogram.begin());
     //thrust::host_device<int> h_letter_occurrences=d_letter_occurrences also works
+    time_processing.stop();
     time_all.stop();
-    save_sorted_to_file(h_histogram);
+    std::cout<<std::endl;
+    save_sorted_to_file(h_histogram,"output/histogram_gpu_thrust.txt");
 }
