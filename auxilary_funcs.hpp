@@ -5,6 +5,7 @@
 #include <string>
 #include <chrono>
 #include <vector>
+#include <unordered_map>
 
 #ifndef PRINT_SORTED_GUARD
 #define PRINT_SORTED_GUARD
@@ -21,8 +22,34 @@ std::string open_file_as_string(std::string filename){
     return file_content;
 }
 
+void save_words_sorted_to_file(const std::unordered_map<std::string,int> &histogram,
+                              const std::string filename){
+    std::vector<std::pair<std::string, int>> vec_sorted (histogram.begin(), histogram.end());
 
-void save_sorted_to_file(const std::vector<int> &histogram, std::string filename) {
+    std::sort(vec_sorted.begin(), vec_sorted.end(), [](const auto& a, const auto& b) {
+        return a.second > b.second;
+    });
+    std::ofstream outfile(filename);
+    if (!outfile.is_open()) {
+        std::cerr << "Failed to open file: sorted_histogram.txt\n";
+        return;
+    };
+
+    double num_words =  std::accumulate(vec_sorted.begin(), vec_sorted.end(), 0,
+    [](int sum, const std::pair<std::string, int>& p) {return sum + p.second;});
+
+
+    for (auto [word,occurrences] : vec_sorted){
+        float percentage=100.0f*occurrences/num_words;
+        outfile<<word<<" = "<<percentage<<"% ("<<occurrences<<")\n";
+    }
+
+
+}
+
+
+
+void save_letters_sorted_to_file(const std::vector<int> &histogram, std::string filename) {
     std::vector<std::pair<u_char, int>> histogram_sorted(256);
     for (int i = 0; i < 256; i++) {
         histogram_sorted[i] = {(u_char)i, histogram[i]};
@@ -41,8 +68,7 @@ void save_sorted_to_file(const std::vector<int> &histogram, std::string filename
             float percentage = 100 * (float)occurrences / total_num_characters;
             outfile << character << " (" << percentage << " %)" << std::endl;
         }
-    }
-    outfile.close();
+    };
 }
 
 
